@@ -175,4 +175,6 @@ public abstract class Command {
     private void fire(CommandSender sender, String... args) {
         //
     }
+
+    public abstract void execute(CommandSender sender, String... args) throws Exception;
 }
