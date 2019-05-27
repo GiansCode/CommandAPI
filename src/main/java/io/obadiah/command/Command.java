@@ -2,6 +2,9 @@ package io.obadiah.command;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import io.obadiah.command.exception.IllegalCommandArgException;
+import io.obadiah.command.exception.IllegalCommandUsageException;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 
@@ -173,7 +176,65 @@ public abstract class Command {
     }
 
     private void fire(CommandSender sender, String... args) {
-        //
+        if (args.length == 0) {
+            this.runChecks(sender, args);
+            return;
+        }
+
+        Command command = this.subCommands.stream()
+          .filter(c -> c.getName().equalsIgnoreCase(args[0]))
+          .findFirst()
+          .orElse(null);
+
+        if (command == null) {
+            this.runChecks(sender, args);
+            return;
+        }
+
+        command.fire(sender, Stream.of(args).skip(1).toArray(String[]::new));
+    }
+
+    private void runChecks(CommandSender sender, String... args) {
+        CommandSource source = CommandSource.fromSender(sender);
+
+        if (!this.permittedSources[source.ordinal()]) {
+            sender.sendMessage(ChatColor.RED + "This command cannot be executed by your account type");
+            return;
+        }
+
+        if (source == CommandSource.PLAYER && !sender.hasPermission(this.permission)) {
+            sender.sendMessage(ChatColor.RED + "You have insufficient permissions to execute this command!");
+            return;
+        }
+
+        if (args.length > this.maxArgs) {
+            return;
+        }
+
+        if (args.length < this.minArgs) {
+            return;
+        }
+
+        try {
+            this.execute(sender, args);
+        } catch (Exception e) {
+            if (e instanceof IllegalCommandArgException) {
+                e.printStackTrace();
+                IllegalCommandArgException ex = (IllegalCommandArgException) e;
+
+                sender.sendMessage(ChatColor.RED + "You have specified the wrong argument type for, " + ex.getArgumentName() +
+                  ", expected a " + ex.getRequiredType().getSimpleName() + "!");
+                return;
+            }
+
+            if (e instanceof IllegalCommandUsageException) {
+                e.printStackTrace();
+                sender.sendMessage(ChatColor.RED + "Incorrect command usage, the correct usage is:\n" + this.getUsage());
+                return;
+            }
+
+            e.printStackTrace();
+        }
     }
 
     public abstract void execute(CommandSender sender, String... args) throws Exception;
