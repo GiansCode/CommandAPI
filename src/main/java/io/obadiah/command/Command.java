@@ -72,37 +72,81 @@ public abstract class Command {
         return this;
     }
 
+    /**
+     * Adds an array of command aliases to this command.
+     *
+     * @param aliases Aliases to register.
+     *
+     * @return This command instance.
+     */
     public Command addAliases(String... aliases) {
         this.aliases.addAll(Stream.of(aliases).collect(Collectors.toList()));
 
         return this;
     }
 
+    /**
+     * Sets the description of this command.
+     *
+     * @param description Description of this command.
+     *
+     * @return This command instance.
+     */
     public Command setDescription(String description) {
         this.description = description;
 
         return this;
     }
 
+    /**
+     * Sets the permission node required to execute this command.
+     *
+     * @param permission Permission node.
+     *
+     * @return This command instance.
+     */
     public Command setPermission(String permission) {
         this.permission = permission;
 
         return this;
     }
 
+    /**
+     * Adds an array of permitted CommandSources to this command.
+     *
+     * @param sources Sources to add.
+     *
+     * @return This command instance.
+     */
     public Command addPermittedSources(CommandSource... sources) {
         Stream.of(sources).forEach(src -> this.permittedSources[src.ordinal()] = true);
 
         return this;
     }
 
+    /**
+     * Removes an array of permitted CommandSources from this command.
+     *
+     * @param sources Source to remove.
+     *
+     * @return This command instance.
+     */
     public Command removePermittedSources(CommandSource... sources) {
         Stream.of(sources).forEach(src -> this.permittedSources[src.ordinal()] = false);
 
         return this;
     }
 
-    public Command setMinArgs(int minArgs) {
+    /**
+     * Sets the minimum arguments required to execute this command.
+     *
+     * @param minArgs Minimum arguments.
+     *
+     * @return This command instance.
+     *
+     * @throws IllegalArgumentException If the {@param minArgs} parameter is below 0.
+     */
+    public Command setMinArgs(int minArgs)  {
         if (minArgs < 0) {
             throw new IllegalArgumentException("Minimum arguments cannot be set below 0!");
         }
@@ -112,36 +156,64 @@ public abstract class Command {
         return this;
     }
 
+    /**
+     * Sets the maximum arguments required to execute this command.
+     *
+     * @param maxArgs Maximum arguments.
+     *
+     * @return This command instance.
+     */
     public Command setMaxArgs(int maxArgs) {
         this.maxArgs = maxArgs;
 
         return this;
     }
 
+    /**
+     * @return The name of this command.
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * @return The subcommands registered against this command.
+     */
     public Set<Command> getSubCommands() {
         return Collections.unmodifiableSet(this.subCommands);
     }
 
+    /**
+     * @return The aliases registered against this command.
+     */
     public Set<String> getAliases() {
         return Collections.unmodifiableSet(this.aliases);
     }
 
+    /**
+     * @return The usage of this command.
+     */
     public String getUsage() {
-        return this.usage;
+        return (this.usage == null || this.usage.isEmpty()) ? GET_USAGE_FUNCTION.apply(this) : this.usage;
     }
 
+    /**
+     * @return The description of this command.
+     */
     public String getDescription() {
         return this.description;
     }
 
+    /**
+     * @return The permission node required to execute this command.
+     */
     public String getPermission() {
         return this.permission;
     }
 
+    /**
+     * @return The CommandSources that are allowed to execute this command.
+     */
     public CommandSource[] getPermittedSources() {
         CommandSource[] sources = new CommandSource[3];
         for (int i = 0; i < this.permittedSources.length; i++) {
@@ -153,28 +225,46 @@ public abstract class Command {
         return sources;
     }
 
+    /**
+     * @return {@code true} If player's are allowed to execute this command.
+     */
     public boolean isPlayerPermitted() {
         return this.permittedSources[0];
     }
 
+    /**
+     * @return {@code true} If the console is allowed to execute this command.
+     */
     public boolean isConsolePermitted() {
         return this.permittedSources[1];
     }
 
+    /**
+     * @return {@code true} If command blocks are allowed to execute this command.
+     */
     public boolean isCommandBlockPermitted() {
         return this.permittedSources[2];
     }
 
+    /**
+     * @return The minimum arguments required to execute this command.
+     */
     public int getMinArgs() {
         return this.minArgs;
     }
 
+    /**
+     * @return The maximum arguments required to execute this command.
+     */
     public int getMaxArgs() {
         return this.maxArgs;
     }
 
+    /**
+     * @return This command as a BukkitCommand.
+     */
     public BukkitCommand asBukkitCommand() {
-        return new BukkitCommand(this.name, this.description, this.usage, Lists.newArrayList(this.aliases)) {
+        return new BukkitCommand(this.name, this.description, this.getUsage(), Lists.newArrayList(this.aliases)) {
             @Override
             public boolean execute(CommandSender sender, String label, String[] args) {
                 Command.this.fire(sender, args);
@@ -245,7 +335,18 @@ public abstract class Command {
         }
     }
 
+    /**
+     * Code to execute when this command has completed all checks.
+     *
+     * @param sender The sender of the command.
+     * @param args The arguments that the sender has sent alongside this command.
+     *
+     * @throws Exception On specific use cases such as incorrect argument types or incorrect usage.
+     */
     protected abstract void execute(CommandSender sender, String... args) throws Exception;
 
+    /**
+     * @return The command usage to accompany this command. If none, it defaults to invoking {@param GET_USAGE_FUNCTION}.
+     */
     protected abstract String getCommandUsage();
 }
