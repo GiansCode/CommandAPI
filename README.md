@@ -2,7 +2,9 @@
 A sane and fluid method of adding multiple commands to Bukkit.
 
 ### Creating a command example
-![Example Command](https://github.com/ObadiahCrowe/CommandAPI/blob/master/docs/example.png)
+![Example Command](https://github.com/GiansCode/CommandAPI/blob/master/docs/example.png)
+
+[Other examples](https://github.com/GiansCode/CommandAPI/blob/master/src/main/example/io/obadiah/example)
 
 ### Checking if a command exists
 ```java
