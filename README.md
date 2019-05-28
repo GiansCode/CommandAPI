@@ -1,8 +1,8 @@
 # CommandAPI
 A sane and fluid method of adding multiple commands to Bukkit.
 
-### Creating a command
-// todo
+### Creating a command example
+![Example Command](https://github.com/ObadiahCrowe/CommandAPI/blob/master/docs/example.png)
 
 ### Checking if a command exists
 ```java

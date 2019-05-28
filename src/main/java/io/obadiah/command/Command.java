@@ -17,8 +17,11 @@ import java.util.stream.Stream;
 
 public abstract class Command {
 
-    private static final String EMPTY = "";
+    /**
+     * A handy method for automatically converting a command instance into a usage string.
+     */
     protected static final Function<Command, String> GET_USAGE_FUNCTION = command -> UsageBuilder.from(command).get();
+    private static final String EMPTY = "";
 
     private final String name;
     private final Set<Command> subCommands;
@@ -33,6 +36,12 @@ public abstract class Command {
     private int minArgs;
     private int maxArgs;
 
+    /**
+     * Represents a command.
+     *
+     * @param name Name of the command.
+     * @param permission The optional permission node that is required to execute this command.
+     */
     public Command(String name, @Nullable String permission) {
         this.name = name;
         this.subCommands = Sets.newHashSet();
@@ -50,6 +59,13 @@ public abstract class Command {
         this.maxArgs = 0;
     }
 
+    /**
+     * Adds an array of subcommands to this command.
+     *
+     * @param commands Commands to register as subcommands.
+     *
+     * @return This command instance.
+     */
     public Command addSubCommands(Command... commands) {
         this.subCommands.addAll(Stream.of(commands).collect(Collectors.toList()));
 

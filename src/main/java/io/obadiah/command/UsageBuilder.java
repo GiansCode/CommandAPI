@@ -39,6 +39,13 @@ public final class UsageBuilder {
         return usage.substring(0, usage.length() - 1);
     }
 
+    /**
+     * Obtains a UsageBuilder instance from a Command. Exists primarily for cleanliness.
+     *
+     * @param command Command to build a usage builder from.
+     *
+     * @return A UsageBuilder instance.
+     */
     public static UsageBuilder from(Command command) {
         return new UsageBuilder(command);
     }

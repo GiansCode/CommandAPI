@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * This is only a plugin to ensure Commodore works with it.
+ */
 @ThreadSafe
 public class CommandAPI extends JavaPlugin {
 
@@ -137,6 +140,9 @@ public class CommandAPI extends JavaPlugin {
         return COMMAND_MAP.getCommand(command) != null;
     }
 
+    /**
+     * @return The CommandAPI instance in use by Bukkit.
+     */
     private static CommandAPI get() {
         return JavaPlugin.getPlugin(CommandAPI.class);
     }
