@@ -11,19 +11,21 @@ import org.bukkit.command.defaults.BukkitCommand;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class Command {
 
     private static final String EMPTY = "";
+    protected static final Function<Command, String> GET_USAGE_FUNCTION = command -> UsageBuilder.from(command).get();
 
     private final String name;
     private final Set<Command> subCommands;
     private final Set<String> aliases;
+    private final String usage;
 
     private String description;
-    private String usage;
 
     private String permission;
     private boolean[] permittedSources;
@@ -35,9 +37,9 @@ public abstract class Command {
         this.name = name;
         this.subCommands = Sets.newHashSet();
         this.aliases = Sets.newHashSet();
+        this.usage = this.getCommandUsage();
 
         this.description = EMPTY;
-        this.usage = EMPTY;
 
         this.permission = permission == null ? EMPTY : permission;
         this.permittedSources = new boolean[] {
@@ -62,12 +64,6 @@ public abstract class Command {
 
     public Command setDescription(String description) {
         this.description = description;
-
-        return this;
-    }
-
-    public Command setUsage(String usage) {
-        this.description = usage;
 
         return this;
     }
@@ -118,12 +114,12 @@ public abstract class Command {
         return Collections.unmodifiableSet(this.aliases);
     }
 
-    public String getDescription() {
-        return this.description;
-    }
-
     public String getUsage() {
         return this.usage;
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 
     public String getPermission() {
@@ -161,12 +157,8 @@ public abstract class Command {
         return this.maxArgs;
     }
 
-    private String createUsage() {
-        return "";
-    }
-
     public BukkitCommand asBukkitCommand() {
-        return new BukkitCommand(this.name, this.description, this.usage == null ? this.createUsage() : this.usage, Lists.newArrayList(this.aliases)) {
+        return new BukkitCommand(this.name, this.description, this.usage, Lists.newArrayList(this.aliases)) {
             @Override
             public boolean execute(CommandSender sender, String label, String[] args) {
                 Command.this.fire(sender, args);
@@ -237,5 +229,7 @@ public abstract class Command {
         }
     }
 
-    public abstract void execute(CommandSender sender, String... args) throws Exception;
+    protected abstract void execute(CommandSender sender, String... args) throws Exception;
+
+    protected abstract String getCommandUsage();
 }

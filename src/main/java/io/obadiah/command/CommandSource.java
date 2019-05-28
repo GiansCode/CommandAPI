@@ -11,8 +11,19 @@ import java.util.stream.Stream;
 @Immutable
 public enum CommandSource {
 
+    /**
+     * A player on the server.
+     */
     PLAYER(Player.class),
+
+    /**
+     * The console or via code.
+     */
     CONSOLE(ConsoleCommandSender.class),
+
+    /**
+     * Any command block (if enabled.)
+     */
     COMMAND_BLOCK(BlockCommandSender.class);
 
     private final Class<?> senderClass;
@@ -21,10 +32,17 @@ public enum CommandSource {
         this.senderClass = senderClass;
     }
 
-    private Class<?> getSenderClass() {
+    public Class<?> getSenderClass() {
         return this.senderClass;
     }
 
+    /**
+     * Obtains the corresponding command source depending based on whether the sender can be assigned from their class.
+     *
+     * @param sender Sender to check.
+     *
+     * @return Corresponding CommandSource.
+     */
     public static CommandSource fromSender(CommandSender sender) {
         return Stream.of(CommandSource.values())
           .filter(source -> source.getSenderClass().isAssignableFrom(sender.getClass()))
