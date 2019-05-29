@@ -306,10 +306,12 @@ public abstract class Command {
         }
 
         if (args.length > this.maxArgs) {
+            sender.sendMessage(ChatColor.RED + "You have specified too many arguments to execute this command!");
             return;
         }
 
         if (args.length < this.minArgs) {
+            sender.sendMessage(ChatColor.RED + "You have not specified enough arguments to execute this command!");
             return;
         }
 

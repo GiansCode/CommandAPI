@@ -7,6 +7,7 @@ import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -23,12 +24,13 @@ import java.util.stream.Stream;
 @ThreadSafe
 public class CommandAPI extends JavaPlugin {
 
-    private static final CommandMap COMMAND_MAP;
+    private static CommandMap COMMAND_MAP;
     private static Commodore COMMODORE = null;
 
-    static {
+    @Override
+    public void onEnable() {
         try {
-            Bukkit.getLogger().info("Obtaining command map for CommandAPI..");
+            this.getLogger().info("Obtaining command map for CommandAPI..");
             Field field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
 
             if (!field.isAccessible()) {
@@ -50,9 +52,9 @@ public class CommandAPI extends JavaPlugin {
      *
      * @param packageName The name of the package to traverse.
      */
-    public static void registerCommands(String packageName) {
+    public static void registerCommands(Plugin plugin, String packageName) {
         try {
-            ClassPath.from(Bukkit.class.getClassLoader()).getTopLevelClasses(packageName).stream()
+            ClassPath.from(CommandAPI.class.getClassLoader()).getTopLevelClasses(packageName).stream()
               .map(ClassPath.ClassInfo::load)
               .filter(c -> Command.class.isAssignableFrom(c) && c != Command.class)
               .forEach(c -> {
@@ -115,7 +117,7 @@ public class CommandAPI extends JavaPlugin {
             COMMODORE.register(bCommand, ((CompletableCommand) command).getCompletions());
         }
 
-        Bukkit.getLogger().info("Registered the command, " + command.getClass().getSimpleName() + ", successfully!");
+        CommandAPI.get().getLogger().info("Registered the command, " + command.getClass().getSimpleName() + ", successfully!");
     }
 
     /**
