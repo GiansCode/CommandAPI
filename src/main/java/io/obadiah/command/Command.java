@@ -18,9 +18,9 @@ import java.util.stream.Stream;
 public abstract class Command {
 
     /**
-     * A handy method for automatically converting a command instance into a usage string.
+     * A handy-dandy method for automatically converting a command instance into a usage string.
      */
-    protected static final Function<Command, String> GET_USAGE_FUNCTION = command -> UsageBuilder.from(command).get();
+    protected static final Function<Command, String> GET_USAGE_FUNCTION = command -> getUsage(command);
     private static final String EMPTY = "";
 
     private final String name;
@@ -350,5 +350,27 @@ public abstract class Command {
     /**
      * @return The command usage to accompany this command. If none, it defaults to invoking {@param GET_USAGE_FUNCTION}.
      */
-    protected abstract String getCommandUsage();
+    protected String getCommandUsage() {
+        return GET_USAGE_FUNCTION.apply(this);
+    }
+
+    private static String getUsage(Command command) {
+        StringBuilder builder = new StringBuilder();
+
+        builder
+          .append("/")
+          .append(command.getName())
+          .append(" ");
+
+        while (command.getSubCommands().size() > 0) {
+            StringBuilder subBuilder = new StringBuilder();
+            String cmds = command.getSubCommands().stream().map(cmd -> cmd.getName() + "/").collect(Collectors.joining());
+
+            subBuilder.append("<").append(cmds, 0, cmds.length() - 1).append("> ");
+            builder.append(subBuilder.toString());
+        }
+
+        String usage = builder.toString();
+        return usage.substring(0, usage.length() - 1);
+    }
 }
