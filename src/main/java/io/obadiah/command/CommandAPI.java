@@ -52,6 +52,7 @@ public class CommandAPI extends JavaPlugin {
      *
      * @param packageName The name of the package to traverse.
      */
+    @SuppressWarnings("UnstableApiUsage")
     public static void registerCommands(Plugin plugin, String packageName) {
         try {
             ClassPath.from(CommandAPI.class.getClassLoader()).getTopLevelClasses(packageName).stream()
@@ -66,7 +67,7 @@ public class CommandAPI extends JavaPlugin {
                       Bukkit.getLogger().info("Attempting to register the command, " + c.getSimpleName() + "..");
                       Command command = (Command) c.getConstructor().newInstance();
 
-                      registerCommand(command);
+                      registerCommand(plugin, command);
                   } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
                       Bukkit.getLogger().severe("Could not register the command, " + c.getSimpleName() + "!!");
                       e.printStackTrace();
@@ -112,6 +113,22 @@ public class CommandAPI extends JavaPlugin {
     public static void registerCommand(Command command) {
         BukkitCommand bCommand = command.asBukkitCommand();
         COMMAND_MAP.register("CommandAPI", bCommand);
+
+        if (COMMODORE != null && command instanceof CompletableCommand) {
+            COMMODORE.register(bCommand, ((CompletableCommand) command).getCompletions());
+        }
+
+        CommandAPI.get().getLogger().info("Registered the command, " + command.getClass().getSimpleName() + ", successfully!");
+    }
+
+    /**
+     * Registers a command.
+     *
+     * @param command Command to register.
+     */
+    public static void registerCommand(Plugin plugin, Command command) {
+        BukkitCommand bCommand = command.asBukkitCommand();
+        COMMAND_MAP.register(plugin.getName(), bCommand);
 
         if (COMMODORE != null && command instanceof CompletableCommand) {
             COMMODORE.register(bCommand, ((CompletableCommand) command).getCompletions());

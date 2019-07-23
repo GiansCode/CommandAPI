@@ -263,6 +263,7 @@ public abstract class Command {
     /**
      * @return This command as a BukkitCommand.
      */
+    @SuppressWarnings("all")
     public BukkitCommand asBukkitCommand() {
         return new BukkitCommand(this.name, this.description, this.getUsage(), Lists.newArrayList(this.aliases)) {
             @Override
@@ -329,7 +330,7 @@ public abstract class Command {
 
             if (e instanceof IllegalCommandUsageException) {
                 e.printStackTrace();
-                sender.sendMessage(ChatColor.RED + "Incorrect command usage, the correct usage is:\n" + this.getUsage());
+                sender.sendMessage(ChatColor.RED + "Incorrect command usage, the correct usage is:\n" + ((IllegalCommandUsageException) e).getUsage());
                 return;
             }
 
@@ -362,7 +363,7 @@ public abstract class Command {
           .append(command.getName())
           .append(" ");
 
-        while (command.getSubCommands().size() > 0) {
+        if (command.getSubCommands() != null && command.getSubCommands().size() >= 1) {
             StringBuilder subBuilder = new StringBuilder();
             String cmds = command.getSubCommands().stream().map(cmd -> cmd.getName() + "/").collect(Collectors.joining());
 

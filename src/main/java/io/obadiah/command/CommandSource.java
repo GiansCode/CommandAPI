@@ -22,7 +22,7 @@ public enum CommandSource {
     CONSOLE(ConsoleCommandSender.class),
 
     /**
-     * Any command block (if enabled.)
+     * Any command block (if enabled).
      */
     COMMAND_BLOCK(BlockCommandSender.class);
 

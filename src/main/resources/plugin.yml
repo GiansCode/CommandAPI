@@ -1,6 +1,6 @@
 name: CommandAPI
 main: io.obadiah.command.CommandAPI
-version: 1.0-SNAPSHOT
+version: 1.0
 authors:
   - Obadiah Crowe
 description: A sane and fluid method of adding multiple commands to Bukkit.
