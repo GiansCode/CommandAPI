@@ -79,12 +79,22 @@ public class CommandAPI extends JavaPlugin {
     }
 
     /**
-     * Registers an array of commands
+     * Registers an array of commands.
      *
      * @param commands Commands to register.
      */
     public static void registerCommands(Command... commands) {
         Stream.of(commands).forEach(CommandAPI::registerCommand);
+    }
+
+    /**
+     * Registers an array of commands against a plugin.
+     *
+     * @param plugin Plugin to register against.
+     * @param commands Commands to register.
+     */
+    public static void registerCommands(Plugin plugin, Command... commands) {
+        Stream.of(commands).forEach(c -> registerCommand(plugin, c));
     }
 
     /**
